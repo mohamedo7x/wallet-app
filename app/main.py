@@ -1,14 +1,10 @@
 """HTTP API for the wallet simulation."""
-
-
-
-from decimal import Decimal
 from typing import Any
 
 from fastapi import FastAPI, HTTPException , Response
 from pydantic import BaseModel, Field
 
-from app.schemas.payment_schema import SendMoney
+from app.schemas.payment_schema import SendMoney, WebhookBody
 from app.fake_bank import FakeBank
 from app.domain.wallet import WalletService
 
@@ -23,9 +19,7 @@ wallets = WalletService(FakeBank())
 
 
 
-class ReceiveMoney(BaseModel):
-    webhook: str = Field(min_length=1)
-
+ 
 
 @app.get("/balance/{name}")
 def get_balance(name: str) -> dict[str, str]:
@@ -45,9 +39,13 @@ def send_money(payment: SendMoney) -> Response:
 
 
 @app.post("/webhook/receive")
-def receive_money(payment: ReceiveMoney) -> dict[str, str]:
-    return wallets.receive(payment.recipient, payment.amount)
+def receive_money(payment: WebhookBody) ->  dict[str, str]:
+    request = wallets.receive(payment)
+    return request
 
+    verify_signature(payment)
+    check_idempotency(payment)
+    wallets.receive(payment.recipient, payment.amount)
 
 
 

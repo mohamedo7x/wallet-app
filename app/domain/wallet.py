@@ -12,6 +12,7 @@ from app.infrastructure.xml.builder import build_payment_request_xml
 from app.domain.transactions import TransactionService
 
 
+from app.schemas.payment_schema import SendMoney, WebhookBody
 
 
 
@@ -43,8 +44,8 @@ class WalletService:
                 "balance": Decimal("500.00"),
             },
         }
-        self._transaction = TransactionService()
 
+        self._transaction = TransactionService()
 
 
     def get_transactions(self) -> list[dict[str, Any]]:
@@ -77,9 +78,6 @@ class WalletService:
             notes=payment.notes
         )
 
-        # Bank approval must happen before changing local balances.
-        self.bank.approve_transfer(xml_request)
-
         self.accounts[sender]["balance"] -= payment.amount
         self.accounts[recipient]["balance"] = self.balance_of(recipient) + payment.amount
 
@@ -93,17 +91,21 @@ class WalletService:
 
         return xml_request
 
-    def receive(self, recipient: str, amount: Decimal) -> dict[str, str]:
+    def receive(self,body: WebhookBody):
         """Simulate an incoming payment approved by the fake bank."""
-        recipient = recipient.lower()
-        reference = self.bank.approve_transfer()
-        self.balances[recipient] = self.balance_of(recipient) + amount
 
-        transaction = {
-            "type": "receive",
-            "recipient": recipient,
-            "amount": f"{amount:.2f}",
-            "reference": reference,
-        }
-        self.transactions.append(transaction)
-        return transaction
+        transaction = self._transaction.handel_incoming_payment(body)
+        
+
+        # recipient = recipient.lower()
+        # reference = self.bank.approve_transfer()
+        # self.balances[recipient] = self.balance_of(recipient) + amount
+
+        # transaction = {
+        #     "type": "receive",
+        #     "recipient": recipient,
+        #     "amount": f"{amount:.2f}",
+        #     "reference": reference,
+        # }
+        # self.transactions.append(transaction)
+        return {"status": "received"}

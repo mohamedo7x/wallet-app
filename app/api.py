@@ -13,6 +13,13 @@ connection = Database(db_path)
 wallets = WalletService(FakeBank())
 
 
+
+
+@app.get("/health")
+def health() -> dict: return {"status": "ok"}
+
+
+
 @app.get("/balance/{name}")
 def get_balance(name: str) -> dict[str, str]:
     return {"name": name.lower(), "balance": f"{wallets.balance_of(name):.2f}"}

@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+app/__init__.py
+app/fake_bank.py
+app/main.py
+app/wallet.py
+tests/test_wallet.py
+wallet_simulator.egg-info/PKG-INFO
+wallet_simulator.egg-info/SOURCES.txt
+wallet_simulator.egg-info/dependency_links.txt
+wallet_simulator.egg-info/requires.txt
+wallet_simulator.egg-info/top_level.txt

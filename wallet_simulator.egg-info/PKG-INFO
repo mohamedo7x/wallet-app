@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: wallet-simulator
+Version: 0.1.0
+Summary: A simple fake-bank wallet API simulator
+Requires-Python: >=3.12
+Requires-Dist: fastapi>=0.115
+Requires-Dist: uvicorn[standard]>=0.30
